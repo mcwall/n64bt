@@ -1,22 +1,25 @@
 #include <Arduino.h>
+#include <stdint.h>
 #include "n64.h"
-#include <BleGamepad.h> 
+#include "bt.h"
+#include "data.h"
 
-N64 nController (13);
-BleGamepad btController("Matt N4 Controller", "Matt Wallick Inc", 100);
+N64Controller nController(13);
+BtController btController;
+ControllerData controllerData;
 
 void setup() {
     Serial.begin(9600);
     nController.init();
+    btController.init();
 }
 
 void loop() {
-    uint32_t test = nController.get();
-    int8_t y = test & 0xff;
-
+    
     // for (int i = 31; i >= 0; i--)
     //     Serial.print((test >> i) & 1 ? 1 : 0);
 
-    Serial.println(y);
+    controllerData.update(nController.status());
+    Serial.println(controllerData.y);
     delay(100);
 }

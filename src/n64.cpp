@@ -15,11 +15,11 @@
 
 #define PIN_QUERY ((REG_READ(GPIO_IN_REG) & PIN_BIT) >> PIN)
 
-N64::N64(unsigned char serialPin) {
+N64Controller::N64Controller(unsigned char serialPin) {
 
 }
 
-void N64::init() {
+void N64Controller::init() {
     pinMode(PIN, INPUT);
     REG_WRITE ( GPIO_ENABLE_REG, PIN_BIT ) ;
     REG_WRITE ( GPIO_OUT_W1TS_REG, PIN_BIT ) ; // High
@@ -32,7 +32,7 @@ void N64::init() {
     interrupts();
 }
 
-uint32_t N64::get() {
+uint32_t N64Controller::status() {
     noInterrupts();
     send(0x01);
     uint32_t state = read();
@@ -40,7 +40,7 @@ uint32_t N64::get() {
     return state;
 }
 
-void N64::send(unsigned char command) {
+void N64Controller::send(unsigned char command) {
     char bits = 8;
         bits=8;
 send_loop:
@@ -69,7 +69,7 @@ send_loop:
     REG_WRITE ( GPIO_OUT_W1TS_REG, PIN_BIT ) ; // High
 }
 
-uint32_t N64::read() {
+uint32_t N64Controller::read() {
     unsigned char timeout;
     int bits = 0;
     int count = 32;
