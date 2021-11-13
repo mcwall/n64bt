@@ -4,10 +4,11 @@
 class N64 {
     public:
         N64(unsigned char pincode);
-        virtual void init();
-        virtual void send(unsigned char command);
-        virtual void get();
+        void init();
+        uint32_t get();
 
-        char raw_dump[33];
+    private:
+        void send(unsigned char command);
+        uint32_t read();
 };
 #endif

@@ -28,11 +28,16 @@ void N64::init() {
     unsigned char poll = 0x01;
 
     noInterrupts();
-    // send(initialize);
-
     send(poll);
-    get();
     interrupts();
+}
+
+uint32_t N64::get() {
+    noInterrupts();
+    send(0x01);
+    uint32_t state = read();
+    interrupts();
+    return state;
 }
 
 void N64::send(unsigned char command) {
@@ -64,48 +69,31 @@ send_loop:
     REG_WRITE ( GPIO_OUT_W1TS_REG, PIN_BIT ) ; // High
 }
 
-// void N64::get() {
-//     unsigned char timeout;
-//     char bitcount = 32;
-//     char *bitbin = raw_dump;
-// read_loop:
-//     REG_WRITE ( GPIO_OUT_W1TC_REG, PIN_BIT ) ; // Low
-//     ONE_MICROSECOND;ONE_MICROSECOND;
-
-//     REG_WRITE ( GPIO_OUT_W1TS_REG, PIN_BIT ) ; // High
-//     ONE_MICROSECOND;ONE_MICROSECOND;
-
-//     raw_dump[--bitcount] = PIN_QUERY;
-//     if (bitcount == 0)
-//         return;
-
-//     goto read_loop;
-// }
-
-
-void N64::get() {
+uint32_t N64::read() {
     unsigned char timeout;
-    char bitcount = 32;
-    char *bitbin = raw_dump;
+    int bits = 0;
+    int count = 32;
+
 read_loop:
 
     // Wait for pin to go low
     timeout = 400;
     while (PIN_QUERY) {
         if (!--timeout)
-            return;
+            return 0;
     }
     
     ONE_MICROSECOND;ONE_MICROSECOND;
-    raw_dump[--bitcount] = PIN_QUERY;
-    if (bitcount == 0)
-        return;
+    bits <<= 1;
+    bits |= PIN_QUERY;
+    if (--count == 0)
+        return bits;
 
     // Wait for pin to go high
     timeout = 400;
     while (!PIN_QUERY) {
         if (!--timeout)
-            return;
+            return 0;
     }
     goto read_loop;
 }
