@@ -1,16 +1,16 @@
 #include <Arduino.h>
 #include "n64.h"
 
-#define PIN 13
+#define PIN 26
 #define PIN_BIT BIT(PIN)
 
 #define NOP asm volatile ("nop\n")
 #define NOP5 NOP;NOP;NOP;NOP;NOP;
 #define NOP10 NOP5;NOP5;
 #define NOP50 NOP10;NOP10;NOP10;NOP10;NOP10;
-#define NOP240 NOP50;NOP50;NOP50;NOP50;NOP10;NOP10;NOP10;
+#define NOP75 NOP50;NOP10;NOP10;NOP5;
 
-#define ONE_MICROSECOND NOP240;
+#define ONE_MICROSECOND NOP75;
 #define TRHEE_MICROSECOND ONE_MICROSECOND;ONE_MICROSECOND;ONE_MICROSECOND;
 
 #define PIN_QUERY ((REG_READ(GPIO_IN_REG) & PIN_BIT) >> PIN)
@@ -65,7 +65,7 @@ send_loop:
     }
 
     REG_WRITE ( GPIO_OUT_W1TC_REG, PIN_BIT ) ; // Low
-    NOP240;
+    ONE_MICROSECOND;
     REG_WRITE ( GPIO_OUT_W1TS_REG, PIN_BIT ) ; // High
 }
 

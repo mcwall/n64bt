@@ -10,6 +10,7 @@ class ControllerData {
         bool l;
         bool r;
         bool start;
+        bool reset;
 
         bool cUp;
         bool cDown;
