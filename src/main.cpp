@@ -18,7 +18,7 @@ unsigned long lastLedBlinkMs;
 void setup() {
     Serial.begin(9600);
     nController.init();
-    btController.init();
+    // btController.init();
 
     ledState = true;
     lastLedBlinkMs = millis();
@@ -66,10 +66,15 @@ void loop() {
     // }
 
     // digitalWrite(LED_PIN, HIGH);
-    controllerData.update(nController.status());
-    btController.update(controllerData);
+    int newStatus = nController.status();
+    int debugStatus = (newStatus & 0xffff0000) >> 16;
+    if (debugStatus > 0)
+        Serial.println(debugStatus);
+    controllerData.update(newStatus);
+    // btController.update(controllerData);
 
-    delay(10);
+    delay(4);
     // debugOutput();
     // Serial.println(controllerData.x);
 }
+

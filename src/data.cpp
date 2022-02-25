@@ -11,6 +11,10 @@ ControllerData::ControllerData() {
 }
 
 void ControllerData::update(uint32_t rawData) {
+    // All bits set indicates something went wrong while polling latest state from controller, don't update state on this cycle
+    if (rawData == 0xffffffff)
+        return;
+
     // Y AXIS
     yRaw = rawData & 0xff;
     if (yRaw > 0) {
