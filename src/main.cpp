@@ -12,45 +12,57 @@ N64Controller nController(DATA_PIN);
 BtController btController;
 ControllerData controllerData;
 
+TaskHandle_t taskMain;
+TaskHandle_t taskPoll;
+
 bool ledState;
 unsigned long lastLedBlinkMs;
+
+void doMain( void * pvParameters ){
+    while (1) {
+        btController.update(controllerData);
+        vTaskDelay(9);
+    }
+}
+
+void doPoll( void * pvParameters ){
+    while (1) {
+        controllerData.update(nController.status());
+        vTaskDelay(4);
+    }
+}
 
 void setup() {
     Serial.begin(9600);
     nController.init();
-    // btController.init();
+    btController.init();
 
     ledState = true;
     lastLedBlinkMs = millis();
     // pinMode(LED_PIN, OUTPUT);
     // digitalWrite(LED_PIN, ledState);
-}
 
-void debugOutput() {
-    Serial.print(controllerData.a);
-    Serial.print(controllerData.b);
-    Serial.print(controllerData.z);
-    Serial.print(controllerData.l);
-    Serial.print(controllerData.r);
+    xTaskCreatePinnedToCore(
+                    doMain,
+                    "TaskMain",
+                    100000,
+                    NULL,
+                    1,
+                    &taskMain,
+                    0);
 
-    Serial.println();
-    Serial.print(controllerData.cUp);
-    Serial.print(controllerData.cDown);
-    Serial.print(controllerData.cLeft);
-    Serial.print(controllerData.cRight);
+    // char * taskStatuses = (char *) malloc(10000000);
+    // vTaskGetRunTimeStats(taskStatuses);
+    // Serial.println(taskStatuses);
 
-    Serial.println();
-    Serial.print(controllerData.dUp);
-    Serial.print(controllerData.dDown);
-    Serial.print(controllerData.dLeft);
-    Serial.print(controllerData.dRight);
-
-    Serial.println();
-    Serial.print(controllerData.start);
-    Serial.print(controllerData.reset);
-
-    Serial.println();
-    Serial.println();
+     xTaskCreatePinnedToCore(
+                    doPoll,
+                    "TaskPoll",
+                    10000,
+                    NULL,
+                    1,
+                    &taskPoll,
+                    1);
 }
 
 void loop() {
@@ -66,15 +78,13 @@ void loop() {
     // }
 
     // digitalWrite(LED_PIN, HIGH);
-    int newStatus = nController.status();
-    int debugStatus = (newStatus & 0xffff0000) >> 16;
-    if (debugStatus > 0)
-        Serial.println(debugStatus);
-    controllerData.update(newStatus);
+    
     // btController.update(controllerData);
 
-    delay(4);
     // debugOutput();
-    // Serial.println(controllerData.x);
+    // Serial.println("foo");
+    // Serial.println(btController.isConnected());
+    // btController.update(controllerData);
+    // delay(500);
 }
 

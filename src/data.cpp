@@ -15,6 +15,8 @@ void ControllerData::update(uint32_t rawData) {
     if (rawData == 0xffffffff)
         return;
 
+    raw = rawData;
+
     // Y AXIS
     yRaw = rawData & 0xff;
     if (yRaw > 0) {

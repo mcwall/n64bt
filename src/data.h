@@ -28,6 +28,8 @@ class ControllerData {
         int8_t xRaw;
         int8_t yRaw;
 
+        uint32_t raw;
+
         ControllerData();
         void update(uint32_t rawData);
 }; 

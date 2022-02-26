@@ -8,5 +8,8 @@ class BtController {
         void init();
         void update(ControllerData status);
         bool isConnected();
+    
+    private:
+        uint32_t lastData;
 };
 #endif

@@ -50,7 +50,7 @@ namespace {
 }
 
 void BtController::update(ControllerData data) {
-    if (!controller.isConnected()){
+    if (data.raw == lastData || !controller.isConnected()) {
         return;
     }
 
@@ -69,6 +69,7 @@ void BtController::update(ControllerData data) {
             controller.release(i+1);
     }
 
+    lastData = data.raw;
     controller.sendReport();
 }
 
